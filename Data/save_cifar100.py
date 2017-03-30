@@ -10,7 +10,9 @@ def ret_index(val, lis):
         if val in lab:
             return i, lab.index(val)
 
+print '[INFO] Fetch cifar100 dataset ...'
 train, test = datasets.get_cifar100(ndim=1)
+print '[INFO] Done fetch!'
 
 new_train = [[] for i in xrange(20)]
 new_test  = [[] for i in xrange(20)]
@@ -38,6 +40,7 @@ labels = [
     [41, 69, 81, 85, 89]
 ]
 
+print '[INFO] Remaking dataset ...'
 for t in train:
     super_class, sub_class = ret_index(t[1], labels)
     new_train[super_class].append([t[0], sub_class])
@@ -45,5 +48,8 @@ for t in train:
 for t in test:
     super_class, sub_class = ret_index(t[1], labels)
     new_test[super_class].append([t[0], sub_class])
+print '[INFO] Done remaking!'
 
+print '[INFO] Save ...'
 np.savez('cifar.npz', train=new_train, test=new_test)
+print '[INFO] Done save!'
