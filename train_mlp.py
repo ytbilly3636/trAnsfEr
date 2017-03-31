@@ -67,9 +67,29 @@ def train_all():
     return
     
 def test_all():
+    x_data_batch = []
+    t_data_batch = []
+    for b in xrange(test.shape[0]):
+        x_data_batch.append(train[b][0])
+        t_data_batch.append(train[b][1])
+        
+    if not USE_GPU:
+        x_batch = Variable(xp.array(x_data_batch, dtype=xp.float32))
+        t_batch = Variable(xp.array(t_data_batch, dtype=np.int32))
+    else:
+        x_batch = Variable(cuda.to_gpu(xp.array(x_data_batch, dtype=xp.float32)))
+        t_batch = Variable(cuda.to_gpu(np.array(t_data_batch, dtype=np.int32)))
+        
+    print '[INFO] Accuracy:', oneset.test_batch(x_batch, t_batch)
+    return
+    
+def load(path):
+    oneset.load(path)
     return
     
 # ---
 if __name__ == '__main__':
-    train_all()
+    #train_all()
+    #load('0_2017_03_30_18:23:07')
+    test_all()
     sys.exit(0)
