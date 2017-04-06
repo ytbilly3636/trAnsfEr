@@ -1,7 +1,7 @@
 #!/usr/bin/python
 #-*- coding:utf-8 -*-
 
-import os, datetime
+import sys, os
 import numpy as np
 import chainer
 import chainer.links as L
@@ -37,6 +37,7 @@ class MLP(Chain):
     def predict(self, x):
         y = self.__call__(x)
         return np.argmax(y.data)
+        
         
 class AE(Chain):
     def __init__(self, in_size, hid_size, active=None):
@@ -84,7 +85,7 @@ class setMLP():
         print '[INFO] Done construct network'
         return
         
-    def train(self, batch_x, batch_t):
+    def train_batch(self, batch_x, batch_t):
         # batch_x:  Variable type
         # batch_t:  Variable type
       
@@ -101,15 +102,25 @@ class setMLP():
         # [1]:  loss of ae
         return self.cls_mlp.loss.data, ae_loss.data
     
-    def save(self, path=None):
-        d = datetime.datetime.today()
-        serializers.save_npz(d.strftime("%Y_%m_%d_%H:%M:%S_mlp.model"), self.mlp)
-        serializers.save_npz(d.strftime("%Y_%m_%d_%H:%M:%S_ae.model"),  self.ae)
+    def test_batch(self, batch_x, batch_t):
+        # batch_x:  Variable type
+        # batch_t:  Variable type
+        
+        self.cls_mlp(batch_x, batch_t)
+        return self.cls_mlp.accuracy.data
+    
+    def save(self, path):
+        # path: string
+
+        serializers.save_npz(path + '_mlp.model', self.mlp)
+        serializers.save_npz(path + '_ae.model',  self.ae)
         
         print '[INFO] Done saving models'
         return
         
     def load(self, path):
+        # path: string
+    
         serializers.load_npz(path + '_mlp.model', self.mlp)
         serializers.load_npz(path + '_ae.model' , self.ae)    
         
@@ -156,7 +167,7 @@ if __name__ == '__main__':
         batch_x = Variable(np.array(batch_data_x, dtype=np.float32))
         batch_t = Variable(np.array(batch_data_t, dtype=np.int32))
         
-        loss0, loss1 = mset.train(batch_x, batch_t)
+        loss0, loss1 = mset.train_batch(batch_x, batch_t)
         
         mlpgraph_y[train_iter] = loss0
         aegraph_y[train_iter] = loss1        
